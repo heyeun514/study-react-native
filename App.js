@@ -22,9 +22,9 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container}>
-        <View style={{width: 50, height:50, backgroundColor: 'powderblue'}} />
-        <View style={{width: 100, height: 100, backgroundColor: 'skyblue'}} />
-        <Text>Hyeeun</Text>
+        <View style={{flex:1, width: 50, height:50, backgroundColor: 'powderblue'}} />
+        <View style={{flex:5, width: 100, height: 100, backgroundColor: 'skyblue'}} />
+        <Text style={{flex:3}}>Hyeeun</Text>
         <Greeting name='hyeeun' />
       </View>
       
@@ -35,7 +35,8 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    //flex: 1,
+    // flex: 1,
+    height: 300,
     backgroundColor: '#fff',
     // alignItems: 'center',
     justifyContent: 'center',
