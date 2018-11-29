@@ -21,11 +21,15 @@ export default class App extends React.Component {
     }
 
     return (
-      <View style={styles.container}>
-        <View style={{flex:1, width: 50, height:50, backgroundColor: 'powderblue'}} />
-        <View style={{flex:5, width: 100, height: 100, backgroundColor: 'skyblue'}} />
-        <Text style={{flex:3}}>Hyeeun</Text>
-        <Greeting name='hyeeun' />
+      <View style={{
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+      }}>
+        <View style={{width: 50, height: 50, backgroundColor: 'powderblue'}} />
+        <View style={{height: 50, backgroundColor: 'skyblue'}} />
+        <View style={{height: 100, backgroundColor: 'steelblue'}} />
       </View>
       
     );
@@ -35,10 +39,12 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    height: 300,
+    flex: 1,
+    flexDirection: 'row',
+    // height: 300,
     backgroundColor: '#fff',
-    // alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
+    // justifyContent: 'space-evenly',
   },
 });
