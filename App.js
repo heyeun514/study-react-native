@@ -1,50 +1,60 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Greeting } from './Greeting';
+import React, { Component } from 'react';
+import { Alert, AppRegistry, Button, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 
-export default class App extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = { isShowingText: true };
-    // setInterval(() => {
-    //   this.setState(previousState => (
-    //     { isShowingText: !previousState.isShowingText }
-    //   ))
-    // }, 1000);
+export default class ButtonBasics extends Component {
+  _onPressButton() {
+    Alert.alert('You tapped the button!')
   }
-
 
   render() {
-    if (!this.state.isShowingText) {
-      return null;
-    }
-
     return (
-      <View style={{
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-      }}>
-        <View style={{width: 50, height: 50, backgroundColor: 'powderblue'}} />
-        <View style={{height: 50, backgroundColor: 'skyblue'}} />
-        <View style={{height: 100, backgroundColor: 'steelblue'}} />
+      <View style={styles.container}>
+        <View style={styles.buttonContainer}>
+          <Button
+            onPress={this._onPressButton}
+            title="Press Me"
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button
+            onPress={this._onPressButton}
+            title="Press Me"
+            color="#841584"
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            onPress={this._onPressButton}>
+            <Text>touch</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.alternativeLayoutButtonContainer}>
+          <Button
+            onPress={this._onPressButton}
+            title="This looks great!"
+          />
+          <Button
+            onPress={this._onPressButton}
+            title="OK!"
+            color="#841584"
+          />
+        </View>
       </View>
-      
     );
   }
-  
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexDirection: 'row',
-    // height: 300,
-    backgroundColor: '#fff',
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    // justifyContent: 'space-evenly',
+   flex: 1,
+   justifyContent: 'center',
   },
+  buttonContainer: {
+    margin: 20
+  },
+  alternativeLayoutButtonContainer: {
+    margin: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  }
 });
