@@ -1,43 +1,28 @@
 import React, { Component } from 'react';
-import { Alert, AppRegistry, Button, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, Image, TouchableWithoutFeedback } from 'react-native';
+import Calendar from './Calendar';
 
-export default class ButtonBasics extends Component {
-  _onPressButton() {
-    Alert.alert('You tapped the button!')
+export default class FlatListBasics extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+    }
   }
 
+  _onPressAdd() {
+    console.log('onPressAdd ' + location.href);
+  }
+  
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.buttonContainer}>
-          <Button
-            onPress={this._onPressButton}
-            title="Press Me"
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <Button
-            onPress={this._onPressButton}
-            title="Press Me"
-            color="#841584"
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            onPress={this._onPressButton}>
-            <Text>touch</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.alternativeLayoutButtonContainer}>
-          <Button
-            onPress={this._onPressButton}
-            title="This looks great!"
-          />
-          <Button
-            onPress={this._onPressButton}
-            title="OK!"
-            color="#841584"
-          />
+      
+        <Calendar month={new Date().getMonth()+1}></Calendar>
+        <View>
+          <TouchableWithoutFeedback onPress={this._onPressAdd.bind(this)}>
+            <Image style={{width: 50, height: 50}} source={require('./assets/plusIcon.png')}/>
+          </TouchableWithoutFeedback>
         </View>
       </View>
     );
@@ -47,14 +32,9 @@ export default class ButtonBasics extends Component {
 const styles = StyleSheet.create({
   container: {
    flex: 1,
-   justifyContent: 'center',
+   paddingTop: 30,
+   flexDirection: 'column',
   },
-  buttonContainer: {
-    margin: 20
-  },
-  alternativeLayoutButtonContainer: {
-    margin: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  }
-});
+  
+})
+
