@@ -1,62 +1,140 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, TouchableWithoutFeedback, Text } from 'react-native';
-import Calendar from './Calendar';
+import { StyleSheet, View, Text, StatusBar, TextInput, Dimensions, Platform, ScrollView } from 'react-native';
+// import Calendar from './Calendar';
+import { AppLoading } from "expo";
+import Todo from './Todo';
+import uuidv1 from 'uuid/v1';
+
+const { width, height} = Dimensions.get('window');
 
 export default class FlatListBasics extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: [],
-    }
-  }
+  state = {
+    newTodo: "",
+    loadedTodos: false,
+    toDos: {},
+  };
 
-  _onPressAdd() {
-    console.log('onPressAdd ' + location.href);
+  componentDidMount = () => {
+    this._loadTodos();
   }
   
   render() {
+    const { newTodo, loadedTodos, toDos} = this.state;
+    console.log(toDos);
+    console.log(Object.values(toDos).length);
+    if (!loadedTodos) {
+      return <AppLoading />
+    }
+
     return (
-      <View style={styles.textContainer}>
+      <View style={styles.container}>
       
-        {/* <Calendar month={new Date().getMonth()+1}></Calendar> */}
-        {/* <View>
-          <TouchableWithoutFeedback onPress={this._onPressAdd.bind(this)}>
-            <Image style={{width: 50, height: 50}} source={require('./assets/plusIcon.png')}/>
-          </TouchableWithoutFeedback>
-        </View> */}
-        
-        <Text style={styles.textChildren}>
-          abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef
-        </Text>
-        <Text style={styles.textChildren}>
-          aaaabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdeeeeeeee
-        </Text>
-        
+       <StatusBar barStyle='light-content' />
+       <Text style={styles.title}> kawai todo </Text>
+       <View style={styles.card}>
+         <TextInput style={styles.input}
+          placeholder={'New Todo'}
+          value={newTodo}
+          onChangeText={this._controlNewTodo}
+          placeholderTextColor={'#999'}
+          returnKeyType={"done"}
+          onSubmitEditing={this._addTodo}>
+          </TextInput>
+          <ScrollView contentContainerStyle={styles.toDos}>
+            {Object.values(toDos).map((todo) => 
+              <Todo key={todo.id} {...todo}></Todo>
+            )}
+            
+          </ScrollView>
+       </View>
       </View>
     );
   }
+
+  _controlNewTodo = text => {
+    this.setState({
+      newTodo: text,
+    })
+  }
+
+  _loadTodos = () => {
+    this.setState({
+      loadedTodos: true,
+    })
+  }
+
+  _addTodo = () => {
+    const {newTodo} = this.state;
+    if (newTodo !== "") {this.setState((prevState) => {
+        const ID = uuidv1();
+        const newObject = {
+          [ID]: {
+            id: ID,
+            isCompleted: false, 
+            text: newTodo,
+            createAt: Date.now()
+          }
+        }
+
+        const newState = {
+          ...prevState,
+          toDos: {
+            ...prevState.toDos,
+            ...newObject,
+          },
+          newTodo: '',
+        }
+
+        return newState;
+      })
+    }
+  }
+
 }
 
 const styles = StyleSheet.create({
   container: {
    flex: 1,
    paddingTop: 30,
+   backgroundColor: '#F23657',
+   alignItems: 'center'
   //  flexDirection: 'column',
   },
-  textContainer: {
-    paddingTop: 30,
-    // flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    display: 'flex',
-    alignItems: 'center',
+  title: {
+    color: 'white',
+    fontSize: 50,
+    marginTop: 50,
+  },
+  card: {
+    flex: 1,
+    backgroundColor: 'white',
+    width: width - 25,
+    height: height,
+    borderTopLeftRadius: 10,
+    ...Platform.select({
+      ios : {
+        shadowColor: "rgb(50, 50, 50)",
+        shadowRadius: 10,
+        shadowOpacity: 0.5,
+        shadowOffset: {
+          height: -1,
+          width: 0,
+        }
+      },
+      android: {
+        elevation: 3,
+      }
+    })
+  },
+  input: {
+    padding: 30,
+    borderBottomColor: '#bbb',
+    borderBottomWidth: 1,
+    fontSize: 25,
 
   },
-  textChildren: {
-    flex: 0.4,
-    backgroundColor: 'red',
-    padding: 20,
-    
+  toDos: {
+    alignItems: 'center',
   }
 })
 
