@@ -5,16 +5,21 @@ import { StyleSheet, View, Text, TouchableOpacity, Dimensions, TextInput } from 
 const { width, height } = Dimensions.get('window');
 
 export default class Todo extends Component {
-    state = {
-        isEditing: false,
-        isCompleted: false,
-        toDoValue: ' ',
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isEditing: false,
+            isCompleted: false,
+            toDoValue: props.text,
+        }
     }
+    
 
 
     render() {
-        const {isCompleted, isEditing, toDoValue} = this.state;
-        const {text} = this.props;
+        const {isEditing, toDoValue} = this.state;
+        const {text, deleteTodo, id, isCompleted} = this.props;
         return (
             <View style={styles.container}>
                     <View style={styles.column}>
@@ -50,7 +55,7 @@ export default class Todo extends Component {
                                 </Text>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => {deleteTodo(id)}}>
                             <View style={styles.actionContainer}>
                                 <Text style={styles.actionText}>
                                 ❌
@@ -64,27 +69,28 @@ export default class Todo extends Component {
             </View>
         )
     }
-
     _toggleComplete = () => {
-        this.setState(prevState => {
-            return {
-                isCompleted: !prevState.isCompleted,
-            }
-        })
+        const {isCompleted, unCompletedTodo, completedTodo, id} = this.props;
+        if (isCompleted){
+            unCompletedTodo(id);
+        } else {
+            completedTodo(id);
+        }
     }
-
+    
     _startEditing = () => {
-        const {text} = this.props;
+        // const {text} = this.props;
         this.setState(prevState => {
             return {
                 isEditing: true,
-                toDoValue: text,
             }
         })
     }
 
     _finishEditing = () => {
+        const { updateTodo, id } = this.props;
         this.setState(prevState => {
+            updateTodo(id, this.state.toDoValue)
             return {
                 isEditing: false,
             }
@@ -96,7 +102,6 @@ export default class Todo extends Component {
             toDoValue: text,
         })
     }
-
 
 }
 
