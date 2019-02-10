@@ -1,12 +1,27 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Dimensions, TextInput } from 'react-native';
 
 
 const { width, height } = Dimensions.get('window');
+export interface TodoProps {
+    text: string;
+    deleteTodo: Function;
+    id: number;
+    isCompleted: boolean;
+    unCompletedTodo: Function;
+    completedTodo: Function;
+    updateTodo: Function;
+}
 
-export default class Todo extends Component {
+interface TodoState {
+    isEditing: boolean;
+    isCompleted: boolean;
+    toDoValue: string;
+}
 
-    constructor(props) {
+export default class Todo extends React.Component<TodoProps, TodoState> {
+
+    constructor(props: TodoProps) {
         super(props);
         this.state = {
             isEditing: false,
@@ -14,8 +29,6 @@ export default class Todo extends Component {
             toDoValue: props.text,
         }
     }
-    
-
 
     render() {
         const {isEditing, toDoValue} = this.state;
@@ -42,7 +55,7 @@ export default class Todo extends Component {
                     {isEditing ?
                         (<TouchableOpacity onPress={this._finishEditing}>
                             <View style={styles.actionContainer}>
-                                <Text style={styles.actionText}>
+                                <Text>}>
                                 ✅
                                 </Text>
                             </View>
@@ -50,14 +63,14 @@ export default class Todo extends Component {
                         (<View style={styles.actions}>
                             <TouchableOpacity onPress={this._startEditing}>
                             <View style={styles.actionContainer}>
-                                <Text style={styles.actionText}>
+                                <Text>
                                 ✏️
                                 </Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {deleteTodo(id)}}>
                             <View style={styles.actionContainer}>
-                                <Text style={styles.actionText}>
+                                <Text>
                                 ❌
                                 </Text>
                             </View>
@@ -97,7 +110,7 @@ export default class Todo extends Component {
         })
     }
 
-    _controlInput = (text) => {
+    _controlInput = (text: string) => {
         this.setState({
             toDoValue: text,
         })

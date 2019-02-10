@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import { 
   StyleSheet,
   View, 
@@ -17,7 +17,21 @@ import uuidv1 from 'uuid/v1';
 
 const { width, height} = Dimensions.get('window');
 
-export default class FlatListBasics extends Component {
+interface IToDo {
+  id: number;
+  text: string;
+  isCompleted: boolean;
+}
+
+interface ToDoAppProps {}
+
+interface ToDoAppState {
+  newTodo: string;
+  loadedTodos: boolean;
+  toDos: Object;
+}
+
+export default class FlatListBasics extends React.Component<ToDoAppProps, ToDoAppState> {
   state = {
     newTodo: "",
     loadedTodos: false,
@@ -30,8 +44,9 @@ export default class FlatListBasics extends Component {
   
   render() {
     const { newTodo, loadedTodos, toDos} = this.state;
+    var _this = this;
     console.log(toDos);
-    console.log(Object.values(toDos).length);
+    // console.log(Object.values(toDos).length);
     if (!loadedTodos) {
       return <AppLoading />
     }
@@ -51,14 +66,28 @@ export default class FlatListBasics extends Component {
           onSubmitEditing={this._addTodo}>
           </TextInput>
           <ScrollView contentContainerStyle={styles.toDos}>
-            {Object.values(toDos).reverse().map((todo) => 
-              <Todo key={todo.id}
+            {/* {Object.values(toDos).reverse().map((value: IToDo, index: number) => {
+              return (<Todo key={index}
                     deleteTodo={this._deleteTodo}
                     completedTodo={this._completedTodo}
                     unCompletedTodo={this._unCompletedTodo}
                     updateTodo={this._updatedTodo}
-                    {...todo}></Todo>
-            )}
+                    isCompleted={value.isCompleted}
+                    text={value.text}
+                    id={value.id}
+                    ></Todo>)
+            })} */}
+            {Object.values(toDos).reverse().map(function (value: IToDo) {
+              return (<Todo key={value.id}
+                    deleteTodo={_this._deleteTodo}
+                    completedTodo={_this._completedTodo}
+                    unCompletedTodo={_this._unCompletedTodo}
+                    updateTodo={_this._updatedTodo}
+                    isCompleted={value.isCompleted}
+                    text={value.text}
+                    id={value.id}
+                    ></Todo>)
+            })}
             
           </ScrollView>
        </View>
@@ -66,25 +95,22 @@ export default class FlatListBasics extends Component {
     );
   }
 
-  _controlNewTodo = text => {
+  _controlNewTodo = (text: string) => {
     this.setState({
       newTodo: text,
     })
   }
 
   _loadTodos = async () => {
-    try {
-        const toDos = await AsyncStorage.getItem("toDos");
-        console.log("loadTodos " + toDos);
+    
+      const toDos = await AsyncStorage.getItem("toDos");
+      console.log("loadTodos " + toDos);
+      if (toDos) {
         this.setState({
           loadedTodos: true,
           toDos: JSON.parse(toDos),
         })
-
-    } catch(e) {
-
-    }
-    
+      }
   }
 
   _addTodo = () => {
@@ -114,7 +140,7 @@ export default class FlatListBasics extends Component {
     }
   }
 
-  _deleteTodo = id => {
+  _deleteTodo = (id: number) => {
     console.log("deleteTodo id=" + id);
     this.setState((prevState) => {
       const { toDos } = this.state;
@@ -129,7 +155,7 @@ export default class FlatListBasics extends Component {
     });
   }
 
-  _completedTodo = id => {
+  _completedTodo = (id: number) => {
     this.setState(prevState => {
       const newState = {
         ...prevState,
@@ -146,7 +172,7 @@ export default class FlatListBasics extends Component {
     })
   }
 
-  _unCompletedTodo = id => {
+  _unCompletedTodo = (id: number) => {
     this.setState(prevState => {
       const newState = {
         ...prevState,
@@ -163,7 +189,7 @@ export default class FlatListBasics extends Component {
     })
   }
 
-  _updatedTodo = (id, value) => {
+  _updatedTodo = (id: number, value: string) => {
     this.setState(prevState => {
       const newState = {
         ...prevState, 
@@ -180,7 +206,7 @@ export default class FlatListBasics extends Component {
     })
   }
 
-  _saveTodos = (newTodos) => {
+  _saveTodos = (newTodos: Object) => {
     console.log(newTodos);
     const saveTodos = AsyncStorage.setItem("toDos", JSON.stringify(newTodos));
   }
