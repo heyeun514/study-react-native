@@ -1,4 +1,7 @@
 import * as React from 'react';
+// import { observable } from 'mobx';
+import { todoStore } from './TodoStore';
+
 import { 
   StyleSheet,
   View, 
@@ -10,7 +13,6 @@ import {
   ScrollView,
   AsyncStorage
 } from 'react-native';
-// import Calendar from './Calendar';
 import { AppLoading } from "expo";
 import Todo from './Todo';
 import uuidv1 from 'uuid/v1';
@@ -21,6 +23,11 @@ interface IToDo {
   id: number;
   text: string;
   isCompleted: boolean;
+  createAt: number;
+}
+
+interface IToDos {
+  [id: string]: IToDo;
 }
 
 interface ToDoAppProps {}
@@ -28,11 +35,11 @@ interface ToDoAppProps {}
 interface ToDoAppState {
   newTodo: string;
   loadedTodos: boolean;
-  toDos: Object;
+  toDos: IToDos;
 }
 
-export default class FlatListBasics extends React.Component<ToDoAppProps, ToDoAppState> {
-  state = {
+export default class TodoApp extends React.Component<ToDoAppProps, ToDoAppState> {
+  state: ToDoAppState = {
     newTodo: "",
     loadedTodos: false,
     toDos: {},
@@ -45,8 +52,8 @@ export default class FlatListBasics extends React.Component<ToDoAppProps, ToDoAp
   render() {
     const { newTodo, loadedTodos, toDos} = this.state;
     var _this = this;
-    console.log(toDos);
-    // console.log(Object.values(toDos).length);
+    console.log("render" + loadedTodos);
+    console.log(Object.values(toDos).length);
     if (!loadedTodos) {
       return <AppLoading />
     }
@@ -66,17 +73,6 @@ export default class FlatListBasics extends React.Component<ToDoAppProps, ToDoAp
           onSubmitEditing={this._addTodo}>
           </TextInput>
           <ScrollView contentContainerStyle={styles.toDos}>
-            {/* {Object.values(toDos).reverse().map((value: IToDo, index: number) => {
-              return (<Todo key={index}
-                    deleteTodo={this._deleteTodo}
-                    completedTodo={this._completedTodo}
-                    unCompletedTodo={this._unCompletedTodo}
-                    updateTodo={this._updatedTodo}
-                    isCompleted={value.isCompleted}
-                    text={value.text}
-                    id={value.id}
-                    ></Todo>)
-            })} */}
             {Object.values(toDos).reverse().map(function (value: IToDo) {
               return (<Todo key={value.id}
                     deleteTodo={_this._deleteTodo}
@@ -110,34 +106,42 @@ export default class FlatListBasics extends React.Component<ToDoAppProps, ToDoAp
           loadedTodos: true,
           toDos: JSON.parse(toDos),
         })
+      } else {
+        this.setState({
+          loadedTodos: true,
+        })
       }
+      
+    
   }
 
   _addTodo = () => {
-    const {newTodo} = this.state;
-    if (newTodo !== "") {this.setState((prevState) => {
-        const ID = uuidv1();
-        const newObject = {
-          [ID]: {
-            id: ID,
-            isCompleted: false, 
-            text: newTodo,
-            createAt: Date.now()
-          }
-        }
+    todoStore._addTodo();
+    // const {newTodo} = this.state;
+    // if (newTodo !== "") {
+    //   this.setState((prevState: ToDoAppState) => {
+    //     const ID = uuidv1();
+    //     const newObject = {
+    //       [ID]: {
+    //         id: ID,
+    //         isCompleted: false, 
+    //         text: newTodo,
+    //         createAt: Date.now()
+    //       }
+    //     }
 
-        const newState = {
-          ...prevState,
-          toDos: {
-            ...prevState.toDos,
-            ...newObject,
-          },
-          newTodo: '',
-        }
-        this._saveTodos(newState.toDos);
-        return {...newState};
-      })
-    }
+    //     const newState = {
+    //       ...prevState,
+    //       toDos: {
+    //         ...prevState.toDos,
+    //         ...newObject,
+    //       },
+    //       newTodo: '',
+    //     }
+    //     this._saveTodos(newState.toDos);
+    //     return {...newState};
+    //   })
+    // }
   }
 
   _deleteTodo = (id: number) => {
