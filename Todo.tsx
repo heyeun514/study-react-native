@@ -23,6 +23,7 @@ export default class Todo extends React.Component<TodoProps, TodoState> {
 
     constructor(props: TodoProps) {
         super(props);
+        
         this.state = {
             isEditing: false,
             isCompleted: false,
