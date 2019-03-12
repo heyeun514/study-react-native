@@ -65,7 +65,7 @@ class TodoStore {
         this.newTodo = '';
         extendObservable(this.toDos, newObject);
         // console.log(this.toDos);
-        // this._saveTodos(this.toDos);
+        this._saveTodos(this.toDos);
       }
     }
 }

@@ -2,6 +2,8 @@ import * as React from 'react';
 // import { observable } from 'mobx';
 // import { todoStore } from './TodoStore';
 import { observer, inject } from 'mobx-react/native';
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
 
 import { 
   StyleSheet,
@@ -22,17 +24,13 @@ const { width, height} = Dimensions.get('window');
 
 interface IToDo {
   id: number;
-  text: string;
+  todoValue: string;
   isCompleted: boolean;
-  createAt: number;
+  createdAt: number;
 }
 
 interface IToDos {
   [id: string]: IToDo;
-}
-
-interface ToDoAppProps {
-    todoStore: any;
 }
 
 interface ToDoAppState {
@@ -41,85 +39,102 @@ interface ToDoAppState {
   toDos: IToDos;
 }
 
-@inject('todoStore')
-@observer
-export default class TodoApp extends React.Component<ToDoAppProps> {
-
-  componentDidMount = () => {
-    AsyncStorage.setItem("toDos", "");
-    this._loadTodos();
+const GET_ALL_TODOLIST = gql`
+  query getAll {
+    todoLists {
+      isCompleted,
+      todoValue
+    }
   }
+`
+
+export default class TodoApp extends React.Component {
+  // componentDidMount = () => {
+  //   AsyncStorage.setItem("toDos", "");
+  //   this._loadTodos();
+  // }
   
   render() {
-      
     // const { loadedTodos } = this.state;
-    const { newTodo, toDos, loadedTodos } = this.props.todoStore;
+    // const { newTodo, toDos } = this.props.todoStore;
     var _this = this;
-    console.log("render" + loadedTodos);
-    console.log(Object.values(toDos).length);
-    if (!loadedTodos) {
-      return <AppLoading />
-    }
 
     return (
-      <View style={styles.container}>
-      
-       <StatusBar barStyle='light-content' />
-       <Text style={styles.title}> kawai todo </Text>
-       <View style={styles.card}>
-         <TextInput style={styles.input}
-          placeholder={'New Todo'}
-          value={newTodo}
-          onChangeText={this._controlNewTodo}
-          placeholderTextColor={'#999'}
-          returnKeyType={"done"}
-          onSubmitEditing={this._addTodo}>
-          </TextInput>
-          <ScrollView contentContainerStyle={styles.toDos}>
-            {Object.values(toDos).reverse().map(function (value: IToDo) {
-              return (<Todo key={value.id}
-                    deleteTodo={_this._deleteTodo}
-                    completedTodo={_this._completedTodo}
-                    unCompletedTodo={_this._unCompletedTodo}
-                    updateTodo={_this._updatedTodo}
-                    isCompleted={value.isCompleted}
-                    text={value.text}
-                    id={value.id}
-                    ></Todo>)
-            })}
-            
-          </ScrollView>
-       </View>
+      <Query query={GET_ALL_TODOLIST}>
+      {({loading, error, data}) => {
+        if (loading) {
+          return <AppLoading />
+        }
+
+        if (error) {
+          return <View><Text>Error</Text></View>
+        }
+        
+        const toDos = data.todoLists;
+        const newTodo = '';
+
+        return (
+          <View style={styles.container}>
+            <StatusBar barStyle='light-content' />
+            <Text style={styles.title}> kawai todo </Text>
+            <View style={styles.card}>
+              <TextInput style={styles.input}
+                placeholder={'New Todo'}
+                value={newTodo}
+                onChangeText={this._controlNewTodo}
+                placeholderTextColor={'#999'}
+                returnKeyType={"done"}
+                onSubmitEditing={this._addTodo}>
+                </TextInput>
+                <ScrollView contentContainerStyle={styles.toDos}>
+                  {Object.values(toDos).reverse().map(function (value: IToDo) {
+                    return (<Todo key={value.id}
+                          deleteTodo={_this._deleteTodo}
+                          completedTodo={_this._completedTodo}
+                          unCompletedTodo={_this._unCompletedTodo}
+                          updateTodo={_this._updatedTodo}
+                          isCompleted={value.isCompleted}
+                          text={value.todoValue}
+                          id={value.id}
+                          ></Todo>)
+                  })}
+                </ScrollView>
+            </View>
       </View>
+        )
+      }}
+      
+      </Query>
     );
   }
 
   _controlNewTodo = (text: string) => {
-    // this.setState({
-    //   newTodo: text,
-    // })
-    console.log('controlnewtodo')
-    this.props.todoStore.updateNewTodo(text);
+    // update New Todo....
   }
 
-  _loadTodos = async () => {
-    
-      const toDos = await AsyncStorage.getItem("toDos");
-      console.log("loadTodos " + toDos);
-      this.props.todoStore._loadedTodos(toDos);
-    //   if (toDos) {
-    //     this.setState({
-    //       loadedTodos: true,
-    //       toDos: JSON.parse(toDos),
-    //     })
-    //   } else {
-    //     this.setState({
-    //       loadedTodos: true,
-    //     })
-    //   }
-      
-    
-  }
+  // _controlNewTodo = (text: string) => {
+  //   // this.setState({
+  //   //   newTodo: text,
+  //   // })
+  //   console.log('controlnewtodo')
+  //   this.props.todoStore.updateNewTodo(text);
+  // }
+
+  // _loadTodos = async () => { 
+  //     const toDos = await AsyncStorage.getItem("toDos");
+  //     console.log("loadTodos " + toDos);
+  //     this.props.todoStore._loadedTodos(toDos);
+  //   //   if (toDos) {
+  //   //     this.setState({
+  //   //       loadedTodos: true,
+  //   //       toDos: JSON.parse(toDos),
+  //   //     })
+  //   //   } else {
+  //   //     this.setState({
+  //   //       loadedTodos: true,
+  //   //     })
+  //   //   }
+  // }
 
   _addTodo = () => {
     this.props.todoStore._addTodo();
@@ -166,20 +181,20 @@ export default class TodoApp extends React.Component<ToDoAppProps> {
   }
 
   _completedTodo = (id: number) => {
-    this.setState(prevState => {
-      const newState = {
-        ...prevState,
-        toDos : {
-          ...prevState.toDos,
-          [id]: {
-            ...prevState.toDos[id],
-            isCompleted: true,
-          }
-        }
-      }
-      this._saveTodos(newState.toDos);
-      return {...newState}
-    })
+    // this.setState(prevState => {
+    //   const newState = {
+    //     ...prevState,
+    //     toDos : {
+    //       ...prevState.toDos,
+    //       [id]: {
+    //         ...prevState.toDos[id],
+    //         isCompleted: true,
+    //       }
+    //     }
+    //   }
+    //   this._saveTodos(newState.toDos);
+    //   return {...newState}
+    // })
   }
 
   _unCompletedTodo = (id: number) => {
